@@ -1,0 +1,147 @@
+import androidhelper
+import datetime
+import time
+ 
+##### to open mobile apps####
+def apppicker(ssp) :
+    result=dr.getLaunchableApplications().result
+    resul=result.get(ssp)
+    try:       
+        dr.launch(resul) 
+    except:
+        print("  ") 
+########this is to speak the text#########
+dr= androidhelper.Android()
+speak=dr.ttsSpeak
+speak('hello sir')
+aeroplane=airplane='flight'
+
+#####this is for input dialog box####
+def dailogbox(title,message):
+    result=dr.dialogGetInput(title,message).result
+    return(result)
+    
+ ### dialog for gmail reciver##
+def gm_reciver():
+    adress=dialogbox("mail","enter mail of reciver")
+    if adress==None or adress2==" ":
+        speak("you didnt enter") and email()
+    else:        
+        return adress     
+           
+######## this is to wish anytime######
+def wishme() :
+    hour= datetime.datetime.now().hour
+    if hour>= 0 and hour< 12:
+        speak(" Good morning!")
+    elif hour<= 12 and hour> 16:
+        speak("good afternoon!")   
+    else :
+        speak("good evening!")              
+wishme()
+        
+#######this is to listen the voice########
+def listen(): 
+    return dr.recognizeSpeech('listening......')
+
+def audio():
+    audio=listen().result
+    return(audio) 
+ ####  for searching###
+ 
+def search(x):
+    dr.search(str(x))
+    
+    ### This is to check airplane mode ##
+def air():
+    airmode=dr.checkAirplaneMode().result
+    if airmode==False :
+        speak('aeroplane mode is off')
+    elif airmode==True:
+        speak('aeroplane mode is onn')
+        
+## this is to change air mode##
+def change_air_mode():
+    dr.toggleAirplaneMode()
+    
+##this is for email##
+def email():
+    reciver=gm_reciver()
+    subject=speak('subject please') and listen().result
+    body=speak('body please') and listen().result
+    dr.sendEmail((str(reciver)),(str(subject)),(str(body)))
+    
+    ##for sms##
+def sms():
+    reciver= speak ('recivers number') and listen().result
+    body=speak('body please') and listen().result
+    dr.smsSend((str(reciver)),(str(body)))
+
+###this is for last known location ####
+def location():
+    locate=dr.getLastKnownLocation().result
+    locate=locate.get('network', locate.get('gps'))
+    latitude=locate.get("latitude")
+    longitude=locate.get("longitude") 
+    print(locate)  
+    return(latitude)
+    return(longitude)
+
+  ######implementation of above work#######
+def query():
+    if ssp=='how are you':
+        speak('i am always fine hope you are good')
+    elif ssp=="ok" or ssp=="okay" or ssp==" ":
+        speak(" ")
+    elif ssp== "what are you doing":
+        speak("i have nothing to do")
+    elif ssp== 'what can you do':
+        speak('ask me: date,time, send gmail , tell me weather,check aeroplane mode, capture picture,record vedio,record audio , open application,my location,search')
+    elif ssp== 'who are you'or ssp=='what is your name'or ssp=='introduction please'or ssp=='who' :
+        speak('i am your personal assistant what can i do for you')     
+    elif ssp=='weather' or ssp=='tell me the weather'or ssp=='how is weather today'or ssp=='todays weather':
+        dr.launch('com.miui.weather2.ActivityWeatherMain')
+    elif ssp=='date' or ssp=='todays date' or ssp=='what is the date today' or ssp=='what is the date':
+        speak('the date is')and speak(time.strftime('%A, %B %e, %Y'))
+    elif ssp=='time'or ssp=='what is the time now'or ssp=='time now'or ssp=='Time' or ssp=='what is the time':
+        speak('the time is')and speak(time.strftime('%I %M %p'))        
+    elif ssp=='take a picture'or ssp=='take photo'or ssp=='take picture'or ssp=='capture picture'or ssp=='photo'or ssp=='picture':
+        dr.cameraCapturePicture("/storage/emulated/0/"+str(datetime.datetime.now())+".jpg") and speak('captured successfully in internal storage')   	
+    elif ssp== 'send mail' or ssp== 'send email' or ssp=='send gmail':
+        email()   
+    elif ssp=='check aeroplane mode' or ssp=='check airplane mode' or ssp== 'get airplane mode':
+        air()
+    elif ssp=='change airplane mode' or ssp=='on airplane mode' or ssp=='off airplane mode'or ssp == 'open airplane mode':
+        change_air_mode()
+    elif ssp== 'send sms' or ssp=='sms':
+        sms()
+    elif ssp=='start recording' or ssp == 'record'or ssp=="record audio":
+        dr.recorderStartMicrophone('/storage/emulated/0/'+str(datetime.datetime.now())+".mp3")and print("your audio will be saved in  internal storage")
+    elif ssp=='record video' or ssp== 'video'or ssp=="start video recording":
+        dr.recorderStartVideo('/storage/emulated/0/'+str(datetime.datetime.now())+".mp4",0,10000000000) and print("your vedio will be saved in internal storage")
+    elif ssp=="search":
+        speak("what to search")
+        x=audio()
+        search(x)    
+    elif ssp=="stop recording" or ssp=="close recording" or ssp=="stop video recording":
+        try:
+            dr.recorderStop() and speak("recording stoped")
+        except:
+            speak("you doesnt start recording")
+    elif ssp== "my location" or ssp== "where am i" or ssp == "where i am" or ssp == "what is my location":
+         dr.viewMap(location())
+         location()     
+
+while True:
+    while dr.ttsIsSpeaking().result:
+        time.sleep(1)
+    ssp=audio() 
+    if ssp == "close" or ssp=="quit" or ssp=="stop" or ssp=="exit":
+        break
+    else:                        
+        apppicker(ssp)                       
+        ssp.lower() 
+        query() 
+      
+          
+    
