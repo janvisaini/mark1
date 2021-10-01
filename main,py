@@ -16,11 +16,15 @@ speak=dr.ttsSpeak
 speak('hello sir')
 aeroplane=airplane='flight'
 
+### func for printing###
+def beauty_print(who,what):
+    print(f"{who} : {what} ")
+
 #####this is for input dialog box####
 def dailogbox(title,message):
     result=dr.dialogGetInput(title,message).result
     return(result)
-    
+  
  ### dialog for gmail reciver##
 def gm_reciver():
     adress=dialogbox("mail","enter mail of reciver")
